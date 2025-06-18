@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+langchain
+pydantic
+langchain-openai==0.3.19
+openai==1.84.0
+langchain-community
+faiss-cpu

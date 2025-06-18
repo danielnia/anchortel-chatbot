@@ -1,0 +1,14 @@
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+backend/.env
+*.db
+backend/unhandled_queries.db
+trash/
+*.env
+venv/
+node_modules/
+dist/
+*.pyc
