@@ -1,4 +1,4 @@
-    # AnchorTel – GenAI-Powered Telecom Chatbot
+# AnchorTel – GenAI-Powered Telecom Chatbot
 
 A full-stack, AI-powered chatbot that simulates a telecom customer support assistant using **FastAPI**, **LangChain**, **OpenAI**, and **Docker**. It includes a secured web UI and a backend with retrieval-augmented generation (RAG) and tools that take predefined actions. 
 Both frontend and backend are independently containerized and deployed on **Google Cloud Run**.
@@ -70,7 +70,7 @@ Run the app:
 uvicorn main:app --host 0.0.0.0 --port 8080
 ```
 
-### 🔹 Cloud Run Deployment
+### Cloud Run Deployment
 
 ```bash
 make build
