@@ -1,24 +1,45 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AnchorTel Chatbot</title>
-<style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AnchorTel Chatbot</title>
+  <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0 auto;
-      max-width: 600px;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
       background-color: #f9f9f9;
     }
-    h2 {
-      text-align: center;
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      padding: 20px;
+      gap: 30px;
+    }
+    .left-panel {
+      flex: 1;
+      max-width: 320px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .right-panel {
+      flex: 2;
+      max-width: 640px;
+    }
+    h2, h3, h4 {
       color: #2c3e50;
     }
+    ul {
+      padding-left: 18px;
+      font-size: 14px;
+      color: #333;
+    }
     #chat-history {
-      margin-top: 20px;
+      margin-top: 10px;
       padding: 10px;
       border: 1px solid #ccc;
       height: 400px;
@@ -36,15 +57,13 @@
     .user-msg {
       background-color: #d0f0fd;
       text-align: left;
-      margin-right: auto;
     }
     .bot-msg {
       background-color: #e2f3db;
       text-align: left;
-      margin-right: auto;
     }
     #input-area {
-      margin-top: 15px;
+      margin-top: 10px;
       display: flex;
       gap: 10px;
     }
@@ -66,85 +85,108 @@
     button:hover {
       background-color: #0056b3;
     }
-    #loading-msg {
-      font-style: italic;
-      color: #888;
-      margin-top: 4px;
-    }
-    #login-section {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    #chat-section {
+    #log-console {
       display: none;
-    }
-    #login-error {
-      color: red;
+      background: #f1f1f1;
+      font-size: 12px;
+      padding: 10px;
+      height: 150px;
+      overflow: auto;
       margin-top: 10px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
-<div style="text-align: center;">
-<img alt="Company Logo" src="/logo.png" style="max-width: 150px; margin-bottom: 10px;"/>
-<h2>AnchorTel Customer Support</h2>
-</div>
-<div id="login-section">
-<input id="username" placeholder="Username" type="text"/><br/><br/>
-<input id="password" placeholder="Password" type="password"/><br/><br/>
-<button id="login-button">Login</button>
-<div id="login-error"></div>
-</div>
-<div id="chat-section">
-<div id="chat-history"></div>
-<div id="input-area">
-<input id="msg" placeholder="Type your message..." type="text"/>
-<button onclick="sendMessage()">Send</button>
+<div class="container">
+  <div class="left-panel">
+    <div style="text-align: center;">
+      <img src="/logo.png" alt="Company Logo" style="max-width: 100px; margin-bottom: 15px;" />
+    </div>
+    <h3 style="text-align: left;">Welcome to AnchorTel</h3>
+    <p style="font-size: 14px; color: #444; text-align: left;">
+      AnchorTel provides high-speed Internet, mobile, and TV services with no contracts, unlimited data, and 24/7 support.
+      Manage your account easily and enjoy affordable bundles tailored to your needs.
+    </p>
+    <h4 style="text-align: left;">Popular FAQs:</h4>
+    <ul style="text-align: left;">
+      <li>What Internet plans are available?</li>
+      <li>How do I set up my account?</li>
+      <li>Can I bring my own device?</li>
+      <li>How can I pay my bill?</li>
+    </ul>
+  </div>
+
+  <div class="right-panel">
+    <div style="text-align: center;">
+      <h2>AnchorTel Customer Support</h2>
+    </div>
+    <div id="login-section" style="text-align: center;">
+      <input id="username" placeholder="Username" type="text"/><br/><br/>
+      <input id="password" placeholder="Password" type="password"/><br/><br/>
+      <button id="login-button">Login</button>
+      <div id="login-error"></div>
+    </div>
+    <div id="chat-section" style="display:none;">
+      <div id="chat-history"></div>
+      <div id="input-area">
+        <input id="msg" placeholder="Ask your question here..." type="text"/>
+        <button onclick="sendMessage()">Send</button>
+      </div>
+      <button onclick="toggleLogs()" style="margin-top:10px;">Show Logs</button>
+      <div id="log-console"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-    let authHeader = "";
-    const userId = getUserId();
-    const msgInput = document.getElementById("msg");
-    const chatBox = document.getElementById("chat-history");
+  let authHeader = "";
+  const userId = getUserId();
+  const msgInput = document.getElementById("msg");
+  const chatBox = document.getElementById("chat-history");
 
-    function getUserId() {
-      let userId = localStorage.getItem("user_id");
-      if (!userId) {
-        userId = `uid_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-        localStorage.setItem("user_id", userId);
-      }
-      return userId;
+  function getUserId() {
+    let userId = localStorage.getItem("user_id");
+    if (!userId) {
+      userId = `uid_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      localStorage.setItem("user_id", userId);
     }
+    return userId;
+  }
 
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-
-      if (!user || !pass) {
-        document.getElementById("login-error").textContent = "Username and password required.";
-        return;
-      }
-
-      authHeader = "Basic " + btoa(`${user}:${pass}`);
-
-      fetch("https://fastapi-backend-1020577311422.us-central1.run.app/test", {
-        headers: { "Authorization": authHeader }
-      })
-      .then(res => {
-        if (res.ok) {
-          document.getElementById("login-section").style.display = "none";
-          document.getElementById("chat-section").style.display = "block";
-          msgInput.focus();
-        } else {
-          throw new Error("Invalid credentials");
-        }
-      })
-      .catch(err => {
-        document.getElementById("login-error").textContent = err.message;
-      });
+  function login() {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+    if (!user || !pass) {
+      document.getElementById("login-error").textContent = "Username and password required.";
+      return;
     }
+    authHeader = "Basic " + btoa(`${user}:${pass}`);
+    fetch("https://fastapi-backend-1020577311422.us-central1.run.app/test", {
+      headers: { "Authorization": authHeader }
+    })
+    .then(res => {
+      if (res.ok) {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("chat-section").style.display = "block";
+        msgInput.focus();
+      } else {
+        throw new Error("Invalid credentials");
+      }
+    })
+    .catch(err => {
+      document.getElementById("login-error").textContent = err.message;
+    });
+  }
 
+  document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("login-button").addEventListener("click", login);
 
     msgInput.addEventListener("keydown", function (e) {
@@ -152,61 +194,60 @@
         sendMessage();
       }
     });
+  });
 
-    async function sendMessage() {
-  const msg = msgInput.value.trim();
-  if (!msg) return;
+  async function sendMessage() {
+    const msg = msgInput.value.trim();
+    if (!msg) return;
 
-  chatBox.innerHTML += `<div class="user-msg">${msg}</div>`;
-  msgInput.value = "";
+    chatBox.innerHTML += `<div class="user-msg">${msg}</div>`;
+    msgInput.value = "";
 
-  const loadingMsg = document.createElement("div");
-  loadingMsg.id = "loading-msg";
-  loadingMsg.textContent = "Bot is typing...";
-  chatBox.appendChild(loadingMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  try {
-    const res = await fetch("https://fastapi-backend-1020577311422.us-central1.run.app/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": authHeader
-      },
-      body: JSON.stringify({ message: msg, user_id: userId })
-    });
-
-    const data = await res.json();
-    document.getElementById("loading-msg").remove();
-
-    console.log("DEBUG logs:", data.logs); // ✅ debug
-    const lc = document.getElementById("log-console");
-    if (data.logs) {
-      lc.innerText += "\n" + data.logs.join("\n");
-      lc.scrollTop = lc.scrollHeight; // auto-scroll
-    }
-
-    chatBox.innerHTML += `<div class="bot-msg">${data.response || data.error}</div>`;
+    const loadingMsg = document.createElement("div");
+    loadingMsg.id = "loading-msg";
+    loadingMsg.textContent = "Bot is typing...";
+    chatBox.appendChild(loadingMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
-  } catch (err) {
-    document.getElementById("loading-msg").remove();
-    chatBox.innerHTML += `<div class="bot-msg">Error: Could not reach the server.</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-}
-    // Show chat section if user_id is already set
-    function toggleLogs() {
-      const logConsole = document.getElementById("log-console");
-      const btn = event.target;
-      if (logConsole.style.display === "none") {
-        logConsole.style.display = "block";
-        btn.textContent = "Hide Logs";
-      } else {
-        logConsole.style.display = "none";
-        btn.textContent = "Show Logs";
+
+    try {
+      const res = await fetch("https://fastapi-backend-1020577311422.us-central1.run.app/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": authHeader
+        },
+        body: JSON.stringify({ message: msg, user_id: userId })
+      });
+
+      const data = await res.json();
+      document.getElementById("loading-msg").remove();
+
+      const lc = document.getElementById("log-console");
+      if (data.logs) {
+        lc.innerText += "\n" + data.logs.join("\n");
+        lc.scrollTop = lc.scrollHeight;
       }
+
+      chatBox.innerHTML += `<div class="bot-msg">${data.response || data.error}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (err) {
+      document.getElementById("loading-msg").remove();
+      chatBox.innerHTML += `<div class="bot-msg">Error: Could not reach the server.</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
-  </script>
-<button onclick="toggleLogs()" style="margin-top:10px;">Show Logs</button>
-<div id="log-console" style="display:none; background:#f1f1f1; font-size:12px; padding:10px; height:150px; overflow:auto; margin-top:10px; border:1px solid #ccc; white-space:pre-wrap;"></div></div></body>
+  }
+
+  function toggleLogs() {
+    const logConsole = document.getElementById("log-console");
+    const btn = event.target;
+    if (logConsole.style.display === "none") {
+      logConsole.style.display = "block";
+      btn.textContent = "Hide Logs";
+    } else {
+      logConsole.style.display = "none";
+      btn.textContent = "Show Logs";
+    }
+  }
+</script>
+</body>
 </html>
