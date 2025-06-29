@@ -27,3 +27,15 @@ deploy:
 	  --platform managed \
 	  --allow-unauthenticated \
 	  --set-env-vars OPENAI_API_KEY=$$OPENAI_API_KEY,AUTH_USERNAME=$$AUTH_USERNAME,AUTH_PASSWORD=$$AUTH_PASSWORD
+
+evaluate:
+	python evaluation_pipeline.py \
+    --reference_file "D:\1- Courses\LLM\CusomerServiceChatBot\trash\Anchortel_info.txt" \
+    --n_parts 4 \
+    --m_questions 5 \
+    --output evaluation_report.csv \
+    --qa_model gpt-4o-mini \
+    --agent_backend remote \
+    --agent_url https://fastapi-backend-1020577311422.us-central1.run.app/chat \
+	--auth_username anchortel_user \
+	--auth_password S3cureP@ss2024!
