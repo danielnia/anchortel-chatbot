@@ -8,6 +8,10 @@ from langchain.schema import SystemMessage
 import logging
 from langchain.chains import RetrievalQA
 from langchain.agents import Tool
+import sqlite3
+from datetime import datetime
+import itertools
+
 
 memory_store = {}
 
@@ -27,8 +31,6 @@ def get_session_memory(session_id: str, llm) -> AgentTokenBufferMemory:
 
 
 # Log unhandled queries for support wit8h Metadata
-import sqlite3
-from datetime import datetime
 
 def log_unhandled(user_id: str, message: str):
     conn = sqlite3.connect("nhandled_queries.db")  # relative path
@@ -42,17 +44,26 @@ def log_unhandled(user_id: str, message: str):
 
 
 # Async query handler with persistent memory
-async def handle_query(session_id: str, user_input: str, logs: list[str]) -> str:
+async def handle_query(session_id: str, user_input: str, logs: list[str], return_docs: bool = False) -> dict | str:
     try:
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
         memory = get_session_memory(session_id, llm)
 
-
         from rag_store import retriever
-        rag_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+        rag_chain = RetrievalQA.from_chain_type(llm=llm,
+                                                retriever=retriever,
+                                                return_source_documents=return_docs )
+
+        def rag_tool_func(query):
+            result = rag_chain({"query": query})
+            return {
+                "answer": result.get("result", "").strip(),
+                "source_documents": result.get("source_documents", [])
+            }
+
         rag_tool = Tool(
             name="AnchortelKnowledgeBase",
-            func=rag_chain.run,
+            func=rag_tool_func,
             description="Useful for answering customer questions about AnchorTel's services, plans, and policies."
         )
 
@@ -60,19 +71,7 @@ async def handle_query(session_id: str, user_input: str, logs: list[str]) -> str
 
         system_message = SystemMessage(
             content=(
-                """You are an intelligent assistant for AnchorTel. You have access to:
-                - Tools for account actions (create, reset, billing)
-                - A document retriever for questions about AnchorTel services
-
-                Instructions:
-                - If you're unsure or don’t have enough information to answer, reply with: 
-                  "I’m not sure about that. Let me note it down for follow-up."
-                - Never make up facts or hallucinate.
-                - If a required field is missing (e.g., email), ask for it before using a tool.
-                - Use tools or the retriever only when necessary to complete the user's request.
-                - If the answer may be unclear or incomplete, ask a clarifying question.
-                - Use the AnchortelKnowledgeBase tool when the user asks general questions about services, plans, 
-                  or policies."""
+                """You are an intelligent assistant for AnchorTel. ..."""
             )
         )
 
@@ -102,15 +101,25 @@ async def handle_query(session_id: str, user_input: str, logs: list[str]) -> str
 
         output = result.get("output", "").strip()
 
-        # If output is empty, fall back to RAG
-        if not output or "i don't know" in output.lower() or "not sure" in output.lower():
-            # Optionally add a fallback like RAG or a logged message
-            rag_answer = rag_chain.run(user_input).strip()
-            if rag_answer:
-                return rag_answer
+        # Extract source_documents from intermediate_steps if RAG tool was used
+        source_documents = []
+        print(result.keys())
 
-            log_unhandled(session_id, user_input)
-            return "I'm not sure I have that information right now. Could you rephrase or give more details?"
+        if return_docs and "intermediate_steps" in result:
+            # print("intermediate_steps found in result: ", result["intermediate_steps"])
+            for action, observation in result["intermediate_steps"]:
+                if getattr(action, "tool", None) == "AnchortelKnowledgeBase":
+                    # observation is the return value of rag_tool_func
+                    docs = observation.get("source_documents", [])
+                    source_documents.extend(docs)
+            # Remove duplicates if needed
+            source_documents = list({id(doc): doc for doc in source_documents}.values())
+
+        if return_docs:
+            return {
+                "answer": output,
+                "source_documents": source_documents
+            }
 
         return output
 

@@ -1,12 +1,12 @@
-PROJECT_ID = gcp-agent-chatbot
-SERVICE_NAME = anchortel-ui
-REGION = us-central1
+include .env
+export
+
 
 #build:
 #	gcloud builds submit . --tag gcr.io/$(PROJECT_ID)/$(SERVICE_NAME)
 
 build:
-	gcloud builds submit . --tag gcr.io/gcp-agent-chatbot/anchortel-ui
+	gcloud builds submit . --tag $(UI_IMAGE_URL)
 
 #deploy:
 #	gcloud run deploy $(SERVICE_NAME) \
@@ -16,8 +16,16 @@ build:
 #		--allow-unauthenticated
 
 deploy:
-	gcloud run deploy anchortel-ui \
-		--image gcr.io/gcp-agent-chatbot/anchortel-ui \
-		--region us-central1 \
+	gcloud run deploy $(UI_SERVICE_NAME) \
+		--image $(UI_IMAGE_URL) \
+		--region $(REGION)\
 		--platform managed \
 		--allow-unauthenticated
+
+run-local:
+	docker run -p 8080:80 \
+		-e MODEL_API_URL=$(MODEL_API_URL) \
+		$(UI_IMAGE_URL)
+
+run-local-dev:
+	npx http-server public -p 8000

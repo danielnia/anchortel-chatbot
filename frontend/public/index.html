@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AnchorTel Chatbot</title>
@@ -105,6 +106,10 @@
   </style>
 </head>
 <body>
+<div id="top-menu" style="display:none; background:#007BFF; color:white; padding:12px 24px; font-size:18px;">
+  <span style="font-weight:bold;">AnchorTel</span>
+  <span id="evaluation-tab" style="float:right; cursor:pointer; margin-left:24px;">Evaluation</span>
+</div>
 <div class="container">
   <div class="left-panel">
     <div style="text-align: center;">
@@ -143,6 +148,7 @@
       <button onclick="toggleLogs()" style="margin-top:10px;">Show Logs</button>
       <div id="log-console"></div>
     </div>
+    <!-- Removed old Evaluation modal and button -->
   </div>
 </div>
 
@@ -164,12 +170,14 @@
   function login() {
     const user = document.getElementById("username").value;
     const pass = document.getElementById("password").value;
+    document.getElementById("top-menu").style.display = "block";
     if (!user || !pass) {
       document.getElementById("login-error").textContent = "Username and password required.";
       return;
     }
     authHeader = "Basic " + btoa(`${user}:${pass}`);
-    fetch("https://fastapi-backend-1020577311422.us-central1.run.app/test", {
+    fetch("https://fastapi-backend-1020577311422.us-central1.run.app/test"
+            , {
       headers: { "Authorization": authHeader }
     })
     .then(res => {
@@ -248,6 +256,11 @@
       btn.textContent = "Show Logs";
     }
   }
+
+  // Only the top menu Evaluation tab remains
+  document.getElementById("evaluation-tab").onclick = () => {
+    window.open("evaluation.html", "_blank", "width=900,height=700");
+  };
 </script>
 </body>
 </html>

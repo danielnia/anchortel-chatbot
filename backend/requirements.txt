@@ -7,3 +7,9 @@ langchain-openai==0.3.19
 openai==1.84.0
 langchain-community
 faiss-cpu
+ragas
+pandas
+python-multipart
+openpyxl
+aiofiles
+rapidfuzz
