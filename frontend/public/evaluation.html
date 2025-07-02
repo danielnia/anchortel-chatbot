@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Evaluation</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    html, body {
+      background: #e6f2ff !important;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      width: 100vw;
+      min-height: 100vh;
+    }
+  #excel-table {
+    margin-left: 0;
+    max-width: 100vw;
+    width: 100vw;
+    overflow-x: auto;
+  }
+    .controls {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 10px 10px;
+    }
+    h2 {
+      color: #007BFF;
+      margin: 20px 0 10px 10px;
+      text-align: left;
+    }
+    .btn {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 18px;
+      margin: 0;
+      cursor: pointer;
+    }
+    .btn:disabled { background: #aaa; }
+    table {
+      border-collapse: collapse;
+      background: #fff;
+      width: 100%;
+      table-layout: fixed;
+    }
+  th, td {
+    border: 1px solid #aaa;
+    padding: 12px 16px;
+    min-width: 120px;
+    width: auto;
+    text-align: left;
+  }
+   input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 1rem;
+  }
+  </style>
+</head>
+<body>
+  <h2>Evaluation</h2>
+  <div class="controls">
+    <input id="num-samples" type="number" min="1" placeholder="Number of test samples" oninput="validateNumSamples()" onchange="validateNumSamples()"/>
+    <button class="btn" id="generate-questions" disabled>Generate Questions</button>
+    <button class="btn" id="evaluate-btn" disabled>Evaluate</button>
+  </div>
+  <div id="excel-table"></div>
+  <script>
+  let tableColumns = [];
+  let tableData = [];
+
+  function validateNumSamples() {
+    const val = document.getElementById('num-samples').value;
+    const btn = document.getElementById('generate-questions');
+    btn.disabled = !(val && !isNaN(val) && Number(val) > 0);
+  }
+
+function renderTable() {
+  const container = document.getElementById("excel-table");
+  if (!tableColumns.length) {
+    container.innerHTML = "";
+    const evalBtn = document.getElementById("evaluate-btn");
+    if (evalBtn) evalBtn.disabled = true;
+    return;
+  }
+  let html = "<table><thead><tr>";
+  tableColumns.forEach(col => html += `<th>${col}</th>`);
+  html += "</tr></thead><tbody>";
+  tableData.forEach((row, rowIdx) => {
+    html += "<tr>";
+    row.forEach((cell, colIdx) => {
+      html += `<td><input type="text" value="${cell}"
+        onchange="updateCell(${rowIdx},${colIdx},this.value)"/></td>`;
+    });
+    html += "</tr>";
+  });
+  html += "</tbody></table>";
+  container.innerHTML = html;
+  const evalBtn = document.getElementById("evaluate-btn");
+  if (evalBtn) evalBtn.disabled = tableData.length === 0;
+}
+
+  document.getElementById("generate-questions").onclick = async function() {
+    const numSamples = document.getElementById("num-samples").value;
+    if (!numSamples) return;
+    const response = await fetch(`https://fastapi-backend-1020577311422.us-central1.run.app/generate-questions?num_questions=${numSamples}`);
+    if (response.ok) {
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      tableColumns = json[0] || [];
+      tableData = json.slice(1) || [];
+      if (!tableColumns.length && tableData.length) {
+        tableColumns = Array.from({length: tableData[0].length}, (_, i) => `Col ${i+1}`);
+      }
+      renderTable();
+    } else {
+      tableColumns = [];
+      tableData = [];
+      renderTable();
+      alert("Failed to generate questions.");
+    }
+  };
+
+  document.getElementById("evaluate-btn").onclick = async function() {
+    if (!tableData.length) {
+      alert("No data to evaluate.");
+      return;
+    }
+    const ws = XLSX.utils.aoa_to_sheet([tableColumns, ...tableData]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const formData = new FormData();
+    formData.append("file", new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "input.xlsx");
+    const response = await fetch("https://fastapi-backend-1020577311422.us-central1.run.app/evaluate-excel", {
+      method: "POST",
+      body: formData
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      tableColumns = json[0] || [];
+      tableData = json.slice(1) || [];
+      if (!tableColumns.length && tableData.length) {
+        tableColumns = Array.from({length: tableData[0].length}, (_, i) => `Col ${i+1}`);
+      }
+      renderTable();
+      alert("Evaluation complete.");
+
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = "evaluation_result.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+      }, 100);
+
+    } else {
+      tableColumns = [];
+      tableData = [];
+      renderTable();
+      alert("Evaluation failed.");
+    }
+  };
+
+  // Initial empty table
+  if (!tableColumns.length && !tableData.length) {
+    tableColumns = Array.from({length: 8}, (_, i) => `Col ${i+1}`);
+    tableData = Array.from({length: 3}, () => Array(8).fill(""));
+    renderTable();
+  }
+
+  window.updateCell = function(row, col, value) {
+    tableData[row][col] = value;
+    const evalBtn = document.getElementById("evaluate-btn");
+    if (evalBtn) evalBtn.disabled = tableData.length === 0;
+  };
+</script>
+</body>
+</html>

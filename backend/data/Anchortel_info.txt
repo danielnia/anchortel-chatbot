@@ -1,0 +1,141 @@
+AnchorTel Company Overview
+
+1. Company Background
+AnchorTel is a leading provider of digital communication services designed to meet the modern connectivity needs of both residential and business customers. Established in 2015, AnchorTel has grown rapidly across North America and has earned a reputation for delivering reliable, fast, and affordable telecommunications solutions.
+
+Headquartered in Denver, Colorado, AnchorTel combines traditional telecom reliability with cloud-native technologies, focusing on flexibility, transparency, and innovation. With a growing customer base of over 3 million users, AnchorTel is setting a new standard in the telecom industry.
+
+2. Services and Plans
+AnchorTel offers a comprehensive portfolio of services:
+
+Home Internet: Fiber and wireless broadband with speeds from 100 Mbps to 2 Gbps. Unlimited data plans available.
+
+Mobile Plans: 5G and LTE service with unlimited talk, text, and data. Family and group bundles include device upgrades and shared billing.
+
+Business Solutions: Secure VoIP lines, team collaboration tools, dedicated internet, and custom onboarding for small to enterprise-scale clients.
+
+Cloud Telephony: For businesses, includes number porting, intelligent routing, IVR, voicemail-to-email, and integration with CRM tools.
+
+Plans are modular and competitive, allowing customers to scale based on usage. AnchorTel offers contract-free subscriptions, early termination protection, and price-lock guarantees for up to two years.
+
+3. Support and Billing
+Customer service is available 24/7 through chat, phone, and email. Premium support tiers are available for enterprise clients. AnchorTel's self-service portal and mobile app allow customers to:
+
+View and pay bills
+
+Manage account settings
+
+Track data usage
+
+Troubleshoot services
+
+Billing is monthly, with automated reminders sent 5 days prior to the due date. Customers can choose between credit/debit cards, bank transfers, or digital wallets.
+
+4. Technical Infrastructure
+AnchorTel operates a geo-redundant infrastructure leveraging data centers in 12 US cities. The network is built on SD-WAN and 5G mesh nodes, which ensures low-latency and high-availability connections for all users.
+
+Key technologies:
+
+Open RAN-based wireless towers
+
+IPv6 native routing
+
+End-to-end encryption for voice and data
+
+Disaster recovery and 99.99% SLA for business-critical services
+
+Their AI-based load balancer automatically adjusts bandwidth across nodes, improving service performance during peak hours.
+
+5. Frequently Asked Questions (FAQs)
+
+Q1: What Internet plans does AnchorTel offer?
+A: AnchorTel offers three fiber Internet plans:
+- Starter 300: 300 Mbps – great for browsing and streaming ($39.99/mo)
+- Power 600: 600 Mbps – ideal for families and remote work ($59.99/mo)
+- Ultra 1 Gig: 1000 Mbps – best for smart homes and heavy use ($79.99/mo)
+
+Q2: Do AnchorTel Internet plans have data caps?
+A: No. All AnchorTel Internet plans include unlimited data with no throttling or overage charges.
+
+Q3: What wireless phone plans are available?
+A: AnchorTel Wireless offers flexible options:
+- Basic Talk: Unlimited talk/text, 2 GB data – $25/mo
+- Everyday Connect: Unlimited talk/text, 15 GB data – $45/mo
+- Unlimited Pro: Unlimited talk/text/data + 10 GB hotspot – $65/mo
+
+Q4: Can I bring my own device to AnchorTel Wireless?
+A: Yes. AnchorTel supports most unlocked GSM-compatible smartphones. Use our website tool to check compatibility before activating.
+
+Q5: What TV plans does AnchorTel offer?
+A: AnchorTel StreamTV includes:
+- Essentials: 40+ live channels – $30/mo
+- Plus: 80+ channels + premium add-ons – $55/mo
+ Both plans include cloud DVR and support for 3 devices simultaneously.
+
+Q6: Is there a discount for bundling services?
+A: Yes! Our popular Trio Bundle includes:
+- Starter 300 Internet + StreamTV Essentials + Basic Talk Wireless for $84.99/mo
+- Upgraded bundles are available with even more savings.
+
+Q7: Are long-term contracts required?
+A: No contracts! All plans are month-to-month, with no early cancellation fees.
+
+Q8: What equipment is provided with AnchorTel services?
+A:
+- Internet plans include a Wi-Fi 6 router
+- TV plans come with an Android TV box (1 included, extras $5/mo each)
+
+Q9: How can I manage my account or pay my bill?
+A: You can use the AnchorTel Mobile App or log into our Customer Portal to manage your services, make payments, or request support.
+
+Q10: What kind of support or guarantee does AnchorTel offer?
+A: We offer:
+- 24/7 U.S.-based customer support
+- A 30-day satisfaction guarantee
+- Free professional installation on select plans
+
+This internal knowledge document is used to inform AI systems and support teams about AnchorTel's operations, offerings, and service details.
+
+###
+- â€œConnectEDâ€ initiative offering subsidized internet for low-income students and veterans
+- Sponsorship of Women in Tech events and diverse STEM scholarships
+
+10. Developer and API Platform
+
+AnchorTel provides APIs and developer tools for tech partners and enterprise customers to customize services.
+
+Available APIs:
+- Telephony API (call logs, SMS, IVR routing)
+- Billing & Subscription API
+- User Device Management API
+- Usage Analytics API
+
+API Features:
+- OAuth2 token-based access
+- SDKs in Python, Node.js, and Java
+- Sandbox environment for prototyping
+- Rate-limited with role-based access control
+
+11. Product Roadmap and Innovation
+
+The Product Strategy Team at AnchorTel is focused on three pillars:
+- AI-Powered Service Agents: Automating support and provisioning
+- Smart Network Optimization: Predictive maintenance and traffic shaping
+- AR/VR Infrastructure: Preparing bandwidth for immersive 3D communications
+
+Upcoming Products:
+- SmartHome Mesh Extension with real-time parental controls
+- â€œAnchorTel Glassâ€: an experimental wearable for on-the-go video conferencing
+- Voice-first dashboard for seniors and visually impaired users
+
+12. Contact and Escalation
+
+For support, please reach out via:
+- Customer Helpline: 1-800-ANCHORTEL
+- Business Inquiries: biz@anchortel.com
+- Technical API Support: devsupport@anchortel.com
+
+Escalation Procedure:
+1. Submit a Level 1 ticket via the Mobile App or Web Portal
+2. If unresolved in 48 hours, escalate to Tier 2 via call or email
+3. Final escalation handled by dedicated Customer Resolution Office
