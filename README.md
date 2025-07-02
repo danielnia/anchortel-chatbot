@@ -1,7 +1,9 @@
-    # AnchorTel – Gen‑AI Telecom Chatbot
+# AnchorTel – Gen‑AI Telecom Chatbot
 
 A full‑stack customer‑support assistant that combines **retrieval‑augmented generation (RAG)** with task‑oriented tools **and an automatic evaluation pipeline**. Built with **FastAPI**, **LangChain / LangGraph**, **OpenAI GPT‑4o**, and packaged for **Docker → Google Cloud Run**.
-
+<p align="center">
+  <img src="backend/images/anchortel_chatbot_arch_enhanced.png" width="720"/>
+</p>
 ---
 
 ## 🔑 Key Features
@@ -105,41 +107,56 @@ cd frontend && make build && make deploy
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  participant User
-  participant FastAPI
-  participant ChatSvc as Chat_Service
-  participant EvalSvc as Evaluation_Service
-  participant Agent
-  participant RAG
-  participant VectorDB
-  participant OpenAI
-  participant RAGAS
-  participant Excel
-  User ->> FastAPI: /chat
-  FastAPI ->> Chat_Service
-  Chat_Service ->> Agent
-  Agent ->> RAG
-  RAG ->> VectorDB
-  VectorDB -->> RAG
-  RAG -->> Agent
-  Agent ->> OpenAI
-  OpenAI -->> Agent
-  Agent -->> Chat_Service
-  Chat_Service -->> FastAPI
-  FastAPI -->> User
-  User ->> FastAPI: /generate-questions
-  FastAPI ->> Evaluation_Service
-  Evaluation_Service ->> OpenAI
-  OpenAI -->> Evaluation_Service
-  Evaluation_Service ->> Excel
-  User ->> FastAPI: /evaluate-excel
-  FastAPI ->> Evaluation_Service
-  Evaluation_Service ->> OpenAI
-  Evaluation_Service ->> RAGAS
-  RAGAS ->> OpenAI
-  RAGAS -->> Evaluation_Service
-  Evaluation_Service ->> Excel
+    autonumber
+
+    %% PARTICIPANTS
+    participant User
+    participant FastAPI
+    participant ChatSvc  as Chat_Service
+    participant EvalSvc  as Evaluation_Service
+    participant Agent
+    participant RAG
+    participant VectorDB
+    participant OpenAI
+    participant RAGAS
+    participant Excel
+
+    %% ---------- 1. CHAT ROUND-TRIP ----------
+    User ->> FastAPI: POST /chat {query}
+    FastAPI ->> ChatSvc: forward
+    ChatSvc ->> Agent: handle_query()
+    Agent ->> RAG: retrieve(query)
+    RAG ->> VectorDB: similarity_search
+    VectorDB -->> RAG: docs
+    RAG -->> Agent: context
+    Agent ->> OpenAI: completion(prompt+context)
+    OpenAI -->> Agent: answer
+    Agent -->> ChatSvc: {answer, sources}
+    ChatSvc -->> FastAPI: response
+    FastAPI -->> User: JSON
+
+    %% ---------- 2. GENERATE TEST Q&A ----------
+    User ->> FastAPI: POST /generate-questions
+    FastAPI ->> EvalSvc: forward
+    EvalSvc ->> OpenAI: generate n Q&A
+    OpenAI -->> EvalSvc: list[Q,A]
+    EvalSvc ->> Excel: create questions.xlsx
+    EvalSvc -->> FastAPI: download link
+    FastAPI -->> User: Excel URL
+
+    %% ---------- 3. EVALUATE EXCEL ----------
+    User ->> FastAPI: POST /evaluate-excel
+    FastAPI ->> EvalSvc: file stream
+    EvalSvc ->> OpenAI: LLM answers per Q
+    OpenAI -->> EvalSvc: answers
+    EvalSvc ->> RAGAS: compute metrics
+    RAGAS ->> OpenAI: sub-eval calls
+    OpenAI -->> RAGAS: scores
+    RAGAS -->> EvalSvc: metrics table
+    EvalSvc ->> Excel: append → evaluated.xlsx
+    EvalSvc -->> FastAPI: download link
+    FastAPI -->> User: evaluated.xlsx
+
 ```
 
 ---
