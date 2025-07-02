@@ -1,7 +1,9 @@
-    # AnchorTel – Gen‑AI Telecom Chatbot
+# AnchorTel – Gen‑AI Telecom Chatbot
 
 A full‑stack customer‑support assistant that combines **retrieval‑augmented generation (RAG)** with task‑oriented tools **and an automatic evaluation pipeline**. Built with **FastAPI**, **LangChain / LangGraph**, **OpenAI GPT‑4o**, and packaged for **Docker → Google Cloud Run**.
-
+<p align="center">
+  <img src="backend/images/anchortel_chatbot_arch_enhanced.png" width="720"/>
+</p>
 ---
 
 ## 🔑 Key Features
